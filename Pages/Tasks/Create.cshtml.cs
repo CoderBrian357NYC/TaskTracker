@@ -35,6 +35,8 @@ namespace TaskTracker.Pages.Tasks
                 return Page();
             }
 
+            TaskItem.CreatedAt = DateTime.UtcNow;
+
             _context.TaskItem.Add(TaskItem);
             await _context.SaveChangesAsync();
 
