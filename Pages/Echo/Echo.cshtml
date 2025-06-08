@@ -1,0 +1,16 @@
+﻿
+@page
+@model TaskTracker.Pages.Echo.EchoModel
+
+<h1>Echo Test</h1>
+
+<form method="post">
+    <label for="inputText">Type something:</label>
+    <input type="text" id="inputText" name="InputText" value="@Model.InputText" />
+    <button type="submit">Submit</button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.EchoedText))
+{
+    <p>You typed: <strong>@Model.EchoedText</strong></p>
+}
