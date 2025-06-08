@@ -14,6 +14,8 @@ namespace TaskTracker.Data
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
              modelBuilder.Entity<TaskItem>()
              .Property(t => t.Title)
              .HasColumnType("TEXT");
