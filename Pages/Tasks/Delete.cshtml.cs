@@ -8,17 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using TaskTracker.Data;
 using TaskTracker.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace TaskTracker.Pages.Tasks
 {
     [Authorize]
     public class DeleteModel : PageModel
     {
-        private readonly TaskTracker.Data.AppDbContext _context;
+        private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DeleteModel(TaskTracker.Data.AppDbContext context)
+        public DeleteModel(TaskTracker.Data.AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [BindProperty]
@@ -31,7 +34,8 @@ namespace TaskTracker.Pages.Tasks
                 return NotFound();
             }
 
-            var taskitem = await _context.TaskItem.FirstOrDefaultAsync(m => m.Id == id);
+            var userId = _userManager.GetUserId(User);
+            var taskitem = await _context.TaskItem.FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
 
             if (taskitem == null)
             {
@@ -51,13 +55,15 @@ namespace TaskTracker.Pages.Tasks
                 return NotFound();
             }
 
-            var taskitem = await _context.TaskItem.FindAsync(id);
-            if (taskitem != null)
-            {
-                TaskItem = taskitem;
-                _context.TaskItem.Remove(TaskItem);
-                await _context.SaveChangesAsync();
-            }
+            var userId = _userManager.GetUserId(User);
+            var taskitem = await _context.TaskItem.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+
+            if (taskitem == null) return NotFound();
+
+            TaskItem = taskitem;
+            _context.TaskItem.Remove(TaskItem);
+            await _context.SaveChangesAsync();
+            
 
             return RedirectToPage("./Index");
         }
