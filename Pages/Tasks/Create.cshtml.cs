@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TaskTracker.Data;
 using TaskTracker.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TaskTracker.Pages.Tasks
 {
+                                                                             [Authorize]
     public class CreateModel : PageModel
     {
         private readonly TaskTracker.Data.AppDbContext _context;
@@ -48,7 +50,7 @@ namespace TaskTracker.Pages.Tasks
                     }
                 }
                 return Page();
-            }                       
+            }
 
 
             // TaskItem.UserId = _userManager.GetUserId(User); 

@@ -16,7 +16,13 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 .AddEntityFrameworkStores<AppDbContext>();
 
 // Add Razor Pages with authorization
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/Tasks");
+}
+
+
+);
 
 var app = builder.Build();
 

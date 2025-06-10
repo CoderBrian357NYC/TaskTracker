@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using TaskTracker.Data;
 using TaskTracker.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TaskTracker.Pages.Tasks
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly TaskTracker.Data.AppDbContext _context;

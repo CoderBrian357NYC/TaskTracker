@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TaskTracker.Data;
 using TaskTracker.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TaskTracker.Pages.Tasks
 {
+    [Authorize]
     public class DeleteModel : PageModel
     {
         private readonly TaskTracker.Data.AppDbContext _context;

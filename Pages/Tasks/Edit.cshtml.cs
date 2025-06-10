@@ -8,16 +8,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TaskTracker.Data;
 using TaskTracker.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace TaskTracker.Pages.Tasks
 {
+    [Authorize]
     public class EditModel : PageModel
     {
-        private readonly TaskTracker.Data.AppDbContext _context;
+        private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public EditModel(TaskTracker.Data.AppDbContext context)
+        public EditModel(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [BindProperty]
@@ -30,7 +35,9 @@ namespace TaskTracker.Pages.Tasks
                 return NotFound();
             }
 
-            var taskitem =  await _context.TaskItem.FirstOrDefaultAsync(m => m.Id == id);
+            var userId = _userManager.GetUserId(User);
+
+            var taskitem = await _context.TaskItem.FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
             if (taskitem == null)
             {
                 return NotFound();
@@ -43,12 +50,36 @@ namespace TaskTracker.Pages.Tasks
         // For more details, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            //Fix: manually set userId
+            TaskItem.UserId = userId;
+
+            //Fix: Remove the validation error or USerId
+            ModelState.Remove("TaskItem.UserId");
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.Attach(TaskItem).State = EntityState.Modified;
+
+            var existingTask = await _context.TaskItem.FirstOrDefaultAsync(t => t.Id == TaskItem.Id && t.UserId == userId);
+
+            if (existingTask == null)
+            {
+                return NotFound();  // Or return Forbid() if you prefer
+            }
+
+            // Ensure the TaskItem's UserId is set to the current user to avoid changes
+            existingTask.Title = TaskItem.Title;
+            existingTask.IsComplete = TaskItem.IsComplete;
+
+
 
             try
             {
