@@ -14,14 +14,14 @@
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.TaskItem[0].Title)</th>
-            <th>@Html.DisplayNameFor(model => model.TaskItem[0].IsComplete)</th>
-            <th>@Html.DisplayNameFor(model => model.TaskItem[0].CreatedAt)</th>
+            <th>@Html.DisplayNameFor(model => model.TaskItems[0].Title)</th>
+            <th>@Html.DisplayNameFor(model => model.TaskItems[0].IsComplete)</th>
+            <th>@Html.DisplayNameFor(model => model.TaskItems[0].CreatedAt)</th>
             <th>Actions</th>  <!-- one column for all action links -->
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.TaskItem) {
+    @foreach (var item in Model.TaskItems) {
         <tr>
             <td>@Html.DisplayFor(modelItem => item.Title)</td>
             <td>@Html.DisplayFor(modelItem => item.IsComplete)</td>
