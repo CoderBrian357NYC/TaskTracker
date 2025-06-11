@@ -17,21 +17,28 @@
             <th>@Html.DisplayNameFor(model => model.TaskItems[0].Title)</th>
             <th>@Html.DisplayNameFor(model => model.TaskItems[0].IsComplete)</th>
             <th>@Html.DisplayNameFor(model => model.TaskItems[0].CreatedAt)</th>
-            <th>Actions</th>  <!-- one column for all action links -->
+            <th>Actions</th> <!-- one column for all action links -->
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.TaskItems) {
-        <tr>
-            <td>@Html.DisplayFor(modelItem => item.Title)</td>
-            <td>@Html.DisplayFor(modelItem => item.IsComplete)</td>
-            <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model.TaskItems)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.IsComplete)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                
+                <form method="post" asp-page-handler="ToggleComplete" asp-route-id="@item.Id" style="display:inline;">
+                    <button type="submit" class="btn btn-sm @(item.IsComplete ? "btn-warning" : "btn-success")">
+                        @(item.IsComplete ? "Mark Incomplete" : "Mark Complete")
+                    </button>
+                </form>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

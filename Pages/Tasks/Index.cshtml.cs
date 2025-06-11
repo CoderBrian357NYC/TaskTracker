@@ -40,5 +40,21 @@ namespace TaskTracker.Pages.Tasks
                 .Where(t => t.UserId == userId)
                 .ToListAsync();
         }
+
+        public async Task<IActionResult> OnPostToggleCompleteAsync(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var task = await _context.TaskItem.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task.IsComplete = !task.IsComplete; // Toggle the value
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage();
+        }
     }
 }
