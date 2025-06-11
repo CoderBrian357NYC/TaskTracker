@@ -18,10 +18,19 @@ namespace TaskTracker.Pages.Tasks
         private readonly TaskTracker.Data.AppDbContext _context;
         private readonly UserManager<ApplicationUser>? _userManager;
 
+        private const int PageSize = 5; // fixed page size
+
         [BindProperty(SupportsGet = true)]
         public string? SearchString { get; set; }
+
         [BindProperty(SupportsGet = true)]
         public bool? ShowCompleted { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;  // current page number, default to 1
+        public IList<TaskItem> TaskItems { get; set; } = default!;
+
+        public int TotalPages { get; set; }  // total number of pages
 
         public IndexModel(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -29,7 +38,6 @@ namespace TaskTracker.Pages.Tasks
             _userManager = userManager;
         }
 
-        public IList<TaskItem> TaskItems { get; set; } = default!;
 
         public async Task OnGetAsync()
         {
@@ -38,6 +46,7 @@ namespace TaskTracker.Pages.Tasks
             if (string.IsNullOrEmpty(userId))
             {
                 TaskItems = new List<TaskItem>();
+                TotalPages = 0;
                 return;
             }
 
@@ -54,9 +63,22 @@ namespace TaskTracker.Pages.Tasks
                 query = query.Where(t => t.IsComplete == ShowCompleted.Value);
             }
 
-            TaskItems = await query.ToListAsync();
-        }
+            // Calculate total count for pagination
+            var totalCount = await query.CountAsync();
+            TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
 
+            // Clamp PageNumber between 1 and TotalPages
+            if (PageNumber < 1) PageNumber = 1;
+            if (PageNumber > TotalPages) PageNumber = TotalPages;
+
+            // Fetch only the current page of results
+            TaskItems = await query
+                .OrderBy(t => t.CreatedAt)  // order consistently
+                .Skip((PageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+        }
+    
         public async Task<IActionResult> OnPostToggleCompleteAsync(int id)
         {
             var userId = _userManager.GetUserId(User);
