@@ -18,6 +18,11 @@ namespace TaskTracker.Pages.Tasks
         private readonly TaskTracker.Data.AppDbContext _context;
         private readonly UserManager<ApplicationUser>? _userManager;
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchString { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public bool? ShowCompleted { get; set; }
+
         public IndexModel(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
@@ -36,9 +41,20 @@ namespace TaskTracker.Pages.Tasks
                 return;
             }
 
-            TaskItems = await _context.TaskItem
-                .Where(t => t.UserId == userId)
-                .ToListAsync();
+            var query = _context.TaskItem.Where(t => t.UserId == userId);
+
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                var lowerSearch = SearchString.ToLower();
+                query = query.Where(t => t.Title.ToLower().Contains(lowerSearch));
+            }
+
+            if (ShowCompleted.HasValue)
+            {
+                query = query.Where(t => t.IsComplete == ShowCompleted.Value);
+            }
+
+            TaskItems = await query.ToListAsync();
         }
 
         public async Task<IActionResult> OnPostToggleCompleteAsync(int id)
